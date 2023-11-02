@@ -1,4 +1,5 @@
 import { DC } from "./constants";
+import { devVars } from "./player";
 
 export function effectiveBaseGalaxies() {
   // Note that this already includes the "50% more" active path effect
@@ -172,7 +173,7 @@ export const Tickspeed = {
       Achievement(66),
       Achievement(83)
     )
-      .times(getTickSpeedMultiplier().pow(this.totalUpgrades));
+      .times(getTickSpeedMultiplier().pow(this.totalUpgrades * devVars.boughtTickspeedMult));
   },
 
   get totalUpgrades() {

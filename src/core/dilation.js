@@ -2,6 +2,7 @@ import { RebuyableMechanicState, SetPurchasableMechanicState } from "./game-mech
 import { DC } from "./constants";
 import FullScreenAnimationHandler from "./full-screen-animation-handler";
 import { SpeedrunMilestones } from "./speedrun";
+import { devVars } from "./player";
 
 export function animateAndDilate() {
   FullScreenAnimationHandler.display("a-dilate", 2);
@@ -107,11 +108,11 @@ export function buyDilationUpgrade(id, bulk = 1) {
 export function getTachyonGalaxyMult(thresholdUpgrade) {
   // This specifically needs to be an undefined check because sometimes thresholdUpgrade is zero
   const upgrade = thresholdUpgrade === undefined ? DilationUpgrade.galaxyThreshold.effectValue : thresholdUpgrade;
-  const thresholdMult = 3.65 * upgrade + 0.35;
+  const thresholdMult = 3.65 * upgrade + devVars.dilation.galaxyThreshold;
   const glyphEffect = getAdjustedGlyphEffect("dilationgalaxyThreshold");
   const glyphReduction = glyphEffect === 0 ? 1 : glyphEffect;
   const power = DilationUpgrade.galaxyThresholdPelle.canBeApplied
-    ? DilationUpgrade.galaxyThresholdPelle.effectValue : 1;
+    ? DilationUpgrade.galaxyThresholdPelle.effectValue : devVars.dilation.galaxyThresholdRoot;
   return (1 + thresholdMult * glyphReduction) ** power;
 }
 
@@ -139,12 +140,13 @@ export function getDilationGainPerSecond() {
     Math.clampMin(Decimal.log10(Replicanti.amount) * getAdjustedGlyphEffect("replicationdtgain"), 1));
   if (Enslaved.isRunning && !dtRate.eq(0)) dtRate = Decimal.pow10(Math.pow(dtRate.plus(1).log10(), 0.85) - 1);
   if (V.isRunning) dtRate = dtRate.pow(0.5);
-  return dtRate;
+  dtRate = dtRate.times(devVars.dilation.dtMult)
+  return dtRate.pow(devVars.dilation.dtPower);
 }
 
 export function tachyonGainMultiplier() {
   if (Pelle.isDisabled("tpMults")) return new Decimal(1);
-  const pow = Enslaved.isRunning ? Enslaved.tachyonNerf : 1;
+  const pow = Enslaved.isRunning ? Enslaved.tachyonNerf : devVars.dilation.tachyonPower;
   return DC.D1.timesEffectsOf(
     DilationUpgrade.tachyonGain,
     GlyphSacrifice.dilation,
@@ -152,7 +154,7 @@ export function tachyonGainMultiplier() {
     RealityUpgrade(4),
     RealityUpgrade(8),
     RealityUpgrade(15)
-  ).pow(pow);
+  ).times(devVars.dilation.tachyonGainMult).pow(pow);
 }
 
 export function rewardTP() {

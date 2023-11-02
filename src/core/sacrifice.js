@@ -1,10 +1,11 @@
 import { DC } from "./constants";
+import { devVars } from "./player";
 
 export class Sacrifice {
   // This is tied to the "buying an 8th dimension" achievement in order to hide it from new players before they reach
   // sacrifice for the first time.
   static get isVisible() {
-    return Achievement(18).isUnlocked || PlayerProgress.realityUnlocked();
+    return Achievement(18).isUnlocked || PlayerProgress.realityUnlocked() || devVars.preInf.allowSacrifice;
   }
 
   static get canSacrifice() {
@@ -66,7 +67,7 @@ export class Sacrifice {
     const postIC2 = 1 + Effects.sum(Achievement(88), TimeStudy(228));
     const triad = TimeStudy(304).effectOrDefault(1);
 
-    return base * preIC2 * postIC2 * triad;
+    return base * preIC2 * postIC2 * triad * devVars.preInf.sacrificeExp;
   }
 
   static get nextBoost() {

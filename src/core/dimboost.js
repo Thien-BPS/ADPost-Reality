@@ -1,4 +1,5 @@
 import { DC } from "./constants";
+import { devVars } from "./player";
 
 class DimBoostRequirement {
   constructor(tier, amount) {
@@ -33,9 +34,10 @@ export class DimBoost {
         Achievement(142),
         GlyphEffect.dimBoostPower,
         PelleRifts.recursion.milestones[0]
-      ).powEffectsOf(InfinityUpgrade.dimboostMult.chargedEffect);
+      ).powEffectsOf(InfinityUpgrade.dimboostMult.chargedEffect)
+      .times(devVars.preInf.dimBoost.dimBoostMult);
     if (GlyphAlteration.isAdded("effarig")) boost = boost.pow(getSecondaryGlyphEffect("effarigforgotten"));
-    return boost;
+    return boost.pow(devVars.preInf.dimBoost.dimBoostPower);
   }
 
   static multiplierToNDTier(tier) {
@@ -73,7 +75,10 @@ export class DimBoost {
       // this case would trigger when we're in IC1.
       return 5;
     }
-    return Infinity;
+    if (devVars.preInf.dimBoost.limitDimBoosts[0]) {
+      return devVars.preInf.dimBoost.limitDimBoosts[1]
+    }
+    return Number.MAX_VALUE;
   }
 
   static get canBeBought() {
@@ -88,6 +93,8 @@ export class DimBoost {
       if (Ra.isRunning) return "Locked (Ra's Reality)";
       if (InfinityChallenge(1).isRunning) return "Locked (Infinity Challenge 1)";
       if (NormalChallenge(8).isRunning) return "Locked (8th Antimatter Dimension Autobuyer Challenge)";
+      if (this.maxBoosts === Number.MAX_VALUE) return "Locked (JS Limitations Reached)"
+      if (devVars.preInf.dimBoost.limitDimBoosts[0]) return "Locked (Devloper Env. Variable)"
     }
     return null;
   }
@@ -157,7 +164,9 @@ export class DimBoost {
   }
 
   static get imaginaryBoosts() {
-    return Ra.isRunning ? 0 : ImaginaryUpgrade(12).effectOrDefault(0) * ImaginaryUpgrade(23).effectOrDefault(1);
+    return Ra.isRunning ? 0 : (devVars.preInf.dimBoost.imaginaryBoosts + ImaginaryUpgrade(12).effectOrDefault(0))
+    * ImaginaryUpgrade(23).effectOrDefault(1)
+    * devVars.preInf.dimBoost.imaginaryBoostsMult;
   }
 
   static get totalBoosts() {
@@ -165,6 +174,7 @@ export class DimBoost {
   }
 
   static get startingDimensionBoosts() {
+    if (devVars.preInf.dimBoost.skipResets[0]) return devVars.preInf.dimBoost.skipResets[1]
     if (InfinityUpgrade.skipResetGalaxy.isBought) return 4;
     if (InfinityUpgrade.skipReset3.isBought) return 3;
     if (InfinityUpgrade.skipReset2.isBought) return 2;
@@ -180,7 +190,7 @@ export function softReset(tempBulk, forcedADReset = false, forcedAMReset = false
   EventHub.dispatch(GAME_EVENT.DIMBOOST_BEFORE, bulk);
   player.dimensionBoosts = Math.max(0, player.dimensionBoosts + bulk);
   resetChallengeStuff();
-  const canKeepDimensions = Pelle.isDoomed
+  const canKeepDimensions = devVars.preInf.dimBoost.keepDims ? true : Pelle.isDoomed
     ? PelleUpgrade.dimBoostResetsNothing.canBeApplied
     : Perk.antimatterNoReset.canBeApplied;
   if (forcedADReset || !canKeepDimensions) {

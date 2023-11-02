@@ -10,6 +10,8 @@ import { Cloud } from "./core/storage";
 import { supportedBrowsers } from "./supported-browsers";
 
 import Payments from "./core/payments";
+import { GameStorage } from "./core/storage/storage";
+import { dev } from "./core/devtools";
 
 if (GlobalErrorHandler.handled) {
   throw new Error("Initialization failed");
@@ -1081,9 +1083,30 @@ export function browserCheck() {
   return supportedBrowsers.test(navigator.userAgent);
 }
 
+export function checkAndLoadSave() {
+  try {
+    GameStorage.load()
+  }
+  catch({ name, message }) {
+    console.error("Error while loading savefile, resetting save. Found error:");
+    console.error(name, message)
+    GameStorage.hardReset();
+    GameStorage.save();
+    dev.forceCloudSave();
+    GlobalErrorHandler.cleanStart = true;
+    player.gotError.type = name;
+    player.gotError.catched = true;
+    window.reload();
+  }
+}
+
+export function allowRGPlusFeat() {
+  return;
+}
+
 export function init() {
   // eslint-disable-next-line no-console
-  console.log("🌌 Antimatter Dimensions: Reality Update 🌌");
+  console.log("🌌 Antimatter Dimensions: Reality Update 🌌\nPost-Reality Modification by Thien");
   if (DEV) {
     // eslint-disable-next-line no-console
     console.log("👨‍💻 Development Mode 👩‍💻");
@@ -1091,7 +1114,7 @@ export function init() {
   ElectronRuntime.initialize();
   SteamRuntime.initialize();
   Cloud.init();
-  GameStorage.load();
+  checkAndLoadSave();
   Tabs.all.find(t => t.config.id === player.options.lastOpenTab).show(true);
   Payments.init();
 }

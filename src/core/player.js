@@ -10,6 +10,97 @@ import { GlyphTypes } from "./glyph-effects";
 // eslint-disable-next-line prefer-const
 window.player = {
   antimatter: DC.E1,
+  dev: {
+    // This dev variable is used for easier devlopement.
+    preInf: {
+      allowSacrifice: false,
+      sacrificeExp: 1,
+      boughtTickspeedMult: 1,
+      dimBoost: {
+        dimBoostMult: new Decimal(1),
+        dimBoostPower: new Decimal(1),
+        limitDimBoosts: [false, 5],
+        imaginaryBoosts: 0,
+        imaginaryBoostsMult: 1,
+        skipResets: [false, 5],
+        keepDims
+      },
+      galaxy: {
+        distantGalaxyStart: 0,
+        remoteGalaxyStart: 0,
+        galaxyScaleAdd: true,
+        allowGalaxies: true,
+      },
+    },
+    infinity: {},
+    replicanti: {
+      replicateMultiplier: new Decimal(1),
+      replicatePowerMult: new Decimal(1),
+      disableChanceCap: false,
+      allowChanceAuto: false,
+      disableIntervalCap: false,
+      allowIntervalAuto: false,
+      distantGalaxyDisable: false,
+      remoteGalaxyDisable: false,
+      maxGalaxyExtra: 0,
+      allowMaxGalaxyAuto: false,
+      forceUnlock: false,
+      disableCap: false,
+    },
+    eternity: {
+      timeDims: {},
+      timeStudy: {},
+      breakEternity: {},
+    },
+    dilation: {
+      galaxyThreshold: 0.35,
+      galaxyThresholdRoot: 1,
+      dtMult: new Decimal(1),
+      dtPower: new Decimal(1),
+      tachyonPower: new Decimal(1),
+      tachyonGainMult: new Decimal(1),
+    },
+    reality: {
+      perks: {},
+      alchemy: {},
+      upgrades: {},
+      glyphs: {},
+      blackHole: {},
+    },
+    celestials: {
+      teresa: {},
+      effarig: {},
+      enslaved: {},
+      v: {},
+      ra: {},
+      laitela: {},
+      pelle: {},
+    },
+    multiverse: {
+      celestials: {
+        thien: {},
+        knull: {},
+        hevi: {},
+        cante: {},
+      },
+      upgrades: {},
+      godlyDims: {},
+    },
+    quantum: {
+      quarks: {},
+      gluons: {},
+      photons: {},
+      nuclei: {},
+      pairedChalls: {},
+      nanofield: {},
+      treeOfDecay: {},
+      bigRip: {},
+    },
+    ascension: {
+      ascensionState: false,
+    },
+    omnisity: {},
+  },
   dimensions: {
     antimatter: Array.range(0, 8).map(() => ({
       bought: 0,
@@ -914,6 +1005,8 @@ window.player = {
     }
   },
 };
+
+export let devVars = player.dev
 
 export const Player = {
   defaultStart: deepmergeAll([{}, player]),

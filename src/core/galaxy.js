@@ -1,7 +1,16 @@
+import { ImaginaryUpgrade } from "./imaginary-upgrades";
+import { devVars } from "./player";
+
 export const GALAXY_TYPE = {
   NORMAL: 0,
   DISTANT: 1,
   REMOTE: 2
+  /** Ignore these.
+   * FURTHER: 2,
+   * REMOTE: 3,
+   * DISSAPERRING: 4,
+   * INVISIBLE: 5,
+   */
 };
 
 class GalaxyRequirement {
@@ -18,7 +27,9 @@ class GalaxyRequirement {
 
 export class Galaxy {
   static get remoteStart() {
-    return RealityUpgrade(21).effectOrDefault(800);
+    return devVars.preInf.galaxy.galaxyScaleAdd ? RealityUpgrade(21).effectOrDefault(800) + devVars.preInf.galaxy.remoteGalaxyStart
+    * ImaginaryUpgrade(18).effectOrDefault(1) :
+    devVars.preInf.galaxy.remoteGalaxyStart;
   }
 
   static get requirement() {
@@ -83,6 +94,7 @@ export class Galaxy {
     if (NormalChallenge(8).isRunning || InfinityChallenge(7).isRunning) return false;
     if (player.records.thisInfinity.maxAM.gt(Player.infinityGoal) &&
        (!player.break || Player.isInAntimatterChallenge)) return false;
+    if (!devVars.galaxy.allowGalaxy) return false;
     return true;
   }
 
@@ -92,16 +104,19 @@ export class Galaxy {
     if (InfinityChallenge(7).isRunning) return "Locked (Infinity Challenge 7)";
     if (InfinityChallenge(1).isRunning) return "Locked (Infinity Challenge 1)";
     if (NormalChallenge(8).isRunning) return "Locked (8th Antimatter Dimension Autobuyer Challenge)";
+    if (!devVars.preInf.galaxy.allowGalaxy) return "Locked (Devloper Env. Variable)"
     return null;
   }
 
   static get costScalingStart() {
-    return 100 + TimeStudy(302).effectOrDefault(0) + Effects.sum(
+    return devVars.preInf.galaxy.galaxyScaleAdd ? 100 + TimeStudy(302).effectOrDefault(0) + Effects.sum(
       TimeStudy(223),
       TimeStudy(224),
       EternityChallenge(5).reward,
       GlyphSacrifice.power
-    );
+    ) + devVars.preInf.galaxy.distantGalaxyStart
+    * ImaginaryUpgrade(18).effectOrDefault(1)
+    : devVars.preInf.galaxy.distantGalaxyStart;
   }
 
   static get type() {

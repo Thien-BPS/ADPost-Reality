@@ -85,7 +85,7 @@ class BlackHoleState {
       id: this.id,
       getAmount: () => this._data.powerUpgrades,
       setAmount: amount => this._data.powerUpgrades = amount,
-      calculateValue: amount => (180 / Math.pow(2, id)) * Math.pow(1.35, amount),
+      calculateValue: amount => (180 / Math.pow(2, id)) * Math.pow(1.5, amount),
       initialCost: 20 * blackHoleCostMultipliers[id],
       costMult: 2,
       hasAutobuyer: true

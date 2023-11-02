@@ -1,4 +1,6 @@
 import { DC } from "./constants";
+import { devVars } from "./player";
+import { TimeStudy } from "./time-studies/normal-time-study";
 
 // Slowdown parameters for replicanti growth, interval will increase by scaleFactor for every scaleLog10
 // OoM past the cap (default is 308.25 (log10 of 1.8e308), 1.2, Number.MAX_VALUE)
@@ -268,7 +270,9 @@ export function replicantiMult() {
     .plusEffectOf(TimeStudy(21))
     .timesEffectOf(TimeStudy(102))
     .clampMin(1)
-    .pow(getAdjustedGlyphEffect("replicationpow"));
+    .pow(getAdjustedGlyphEffect("replicationpow"))
+    .times(devVars.replicanti.replicateMultiplier)
+    .pow(devVars.replicanti.replicatePowerMult);
 }
 
 /** @abstract */
@@ -343,8 +347,8 @@ export const ReplicantiUpgrade = {
     get costIncrease() { return 1e15; }
 
     get cap() {
-      // Chance never goes over 100%.
-      return 1;
+      // Chance never goes over 100% unless you have that timestudy.
+      return (devVars.replicanti.disableChanceCap || TimeStudy(11).isBought ) ? Number.MAX_VALUE : 1;
     }
 
     get isCapped() {
@@ -352,7 +356,7 @@ export const ReplicantiUpgrade = {
     }
 
     get autobuyerMilestone() {
-      return EternityMilestone.autobuyerReplicantiChance;
+      return EternityMilestone.autobuyerReplicantiChance || devVars.replicanti.allowChanceAuto;
     }
 
     autobuyerTick() {
@@ -394,7 +398,7 @@ export const ReplicantiUpgrade = {
     get costIncrease() { return 1e10; }
 
     get cap() {
-      return Effects.min(50, TimeStudy(22));
+      return (devVars.replicanti.disableIntervalCap || RealityUpgrade(23).isBought) ? 0 : Effects.min(50, TimeStudy(22));
     }
 
     get isCapped() {
@@ -402,7 +406,7 @@ export const ReplicantiUpgrade = {
     }
 
     get autobuyerMilestone() {
-      return EternityMilestone.autobuyerReplicantiInterval;
+      return EternityMilestone.autobuyerReplicantiInterval || devVars.replicanti.allowIntervalAuto;
     }
 
     applyModifiers(value) {
@@ -427,11 +431,11 @@ export const ReplicantiUpgrade = {
     set baseCost(value) { player.replicanti.galCost = value; }
 
     get distantRGStart() {
-      return 100 + Effects.sum(GlyphSacrifice.replication);
+      return devVars.replicanti.distantGalaxyDisable ? Number.MAX_VALUE : 1500 + Effects.sum(GlyphSacrifice.replication);
     }
 
     get remoteRGStart() {
-      return 1000 + Effects.sum(GlyphSacrifice.replication);
+      return devVars.replicanti.remoteGalaxyDisable ? Number.MAX_VALUE : 10000 + Effects.sum(GlyphSacrifice.replication);
     }
 
     get costIncrease() {
@@ -449,11 +453,11 @@ export const ReplicantiUpgrade = {
     }
 
     get autobuyerMilestone() {
-      return EternityMilestone.autobuyerReplicantiMaxGalaxies;
+      return EternityMilestone.autobuyerReplicantiMaxGalaxies || devVars.replicanti.allowMaxGalaxyAuto;
     }
 
     get extra() {
-      return Effects.max(0, TimeStudy(131)) + PelleRifts.decay.milestones[2].effectOrDefault(0);
+      return Effects.max(0, TimeStudy(131)) + PelleRifts.decay.milestones[2].effectOrDefault(0) + devVars.replicanti.maxGalaxyExtra;
     }
 
     autobuyerTick() {
@@ -471,10 +475,10 @@ export const ReplicantiUpgrade = {
 
     baseCostAfterCount(count) {
       const logBase = 170;
-      const logBaseIncrease = EternityChallenge(6).isRunning ? 2 : 25;
-      const logCostScaling = EternityChallenge(6).isRunning ? 2 : 5;
-      const distantReplicatedGalaxyStart = 100 + Effects.sum(GlyphSacrifice.replication);
-      const remoteReplicatedGalaxyStart = 1000 + Effects.sum(GlyphSacrifice.replication);
+      const logBaseIncrease = EternityChallenge(6).isRunning ? 1.1 : 3;
+      const logCostScaling = EternityChallenge(6).isRunning ? 1.1 : 2.5;
+      const distantReplicatedGalaxyStart = devVars.replicanti.distantGalaxyDisable ? Number.MAX_VALUE : 1500 + Effects.sum(GlyphSacrifice.replication);
+      const remoteReplicatedGalaxyStart = devVars.replicanti.remoteGalaxyDisable ? Number.MAX_VALUE : 10000 + Effects.sum(GlyphSacrifice.replication);
       let logCost = logBase + count * logBaseIncrease + (count * (count - 1) / 2) * logCostScaling;
       if (count > distantReplicatedGalaxyStart) {
         const logDistantScaling = 50;
@@ -499,7 +503,7 @@ export const Replicanti = {
   get areUnlocked() {
     return player.replicanti.unl;
   },
-  reset(force = false) {
+  reset(force = devVars.replicanti.forceUnlock) {
     const unlocked = force ? false : EternityMilestone.unlockReplicanti.isReached;
     player.replicanti = {
       unl: unlocked,
@@ -514,7 +518,7 @@ export const Replicanti = {
       galCost: DC.E170,
     };
   },
-  unlock(freeUnlock = false) {
+  unlock(freeUnlock = devVars.replicanti.forceUnlock) {
     const cost = DC.E140.dividedByEffectOf(PelleRifts.vacuum.milestones[1]);
     if (player.replicanti.unl) return;
     if (freeUnlock || Currency.infinityPoints.gte(cost)) {
@@ -571,6 +575,7 @@ export const Replicanti = {
     },
   },
   get isUncapped() {
-    return TimeStudy(192).isBought || PelleRifts.vacuum.milestones[1].canBeApplied;
+    return TimeStudy(192).isBought || PelleRifts.vacuum.milestones[1].canBeApplied ||
+    devVars.replicanti.disableCap;
   }
 };

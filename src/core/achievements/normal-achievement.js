@@ -32,12 +32,18 @@ class AchievementState extends GameMechanicState {
     return this.row < 18;
   }
 
+  // No clue what this is used for yet, but I'll put it anyways.
+  get isPostDoomed() {
+    return this.row > 18
+  }
+
   get isUnlocked() {
     return (player.achievementBits[this.row - 1] & this._bitmask) !== 0;
   }
 
   get isDisabled() {
-    return Pelle.isDisabled("achievements") && Pelle.disabledAchievements.includes(this.id);
+    return Pelle.isDisabled("achievements") && Pelle.disabledAchievements.includes(this.id) && 
+    !player.dev.Achievements.noPelleDisable;
   }
 
   get isEffectActive() {
