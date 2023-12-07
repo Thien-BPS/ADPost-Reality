@@ -33,6 +33,7 @@ export class DimBoost {
         Achievement(117),
         Achievement(142),
         GlyphEffect.dimBoostPower,
+        devVars.reality.upgrades.amplifyImaginaryUpgrades ? ImaginaryUpgrade(24) : null,
         PelleRifts.recursion.milestones[0]
       ).powEffectsOf(InfinityUpgrade.dimboostMult.chargedEffect)
       .times(devVars.preInf.dimBoost.dimBoostMult);
@@ -190,9 +191,9 @@ export function softReset(tempBulk, forcedADReset = false, forcedAMReset = false
   EventHub.dispatch(GAME_EVENT.DIMBOOST_BEFORE, bulk);
   player.dimensionBoosts = Math.max(0, player.dimensionBoosts + bulk);
   resetChallengeStuff();
-  const canKeepDimensions = devVars.preInf.dimBoost.keepDims ? true : Pelle.isDoomed
+  const canKeepDimensions = devVars.preInf.dimBoost.keepDims ? true : (Pelle.isDoomed
     ? PelleUpgrade.dimBoostResetsNothing.canBeApplied
-    : Perk.antimatterNoReset.canBeApplied;
+    : Perk.antimatterNoReset.canBeApplied);
   if (forcedADReset || !canKeepDimensions) {
     AntimatterDimensions.reset();
     player.sacrificed = DC.D0;
@@ -212,6 +213,8 @@ export function softReset(tempBulk, forcedADReset = false, forcedAMReset = false
 
 export function skipResetsIfPossible(enteringAntimatterChallenge) {
   if (enteringAntimatterChallenge || Player.isInAntimatterChallenge) return;
+  if (devVars.preInf.dimBoost.skipResets[0]
+  && player.dimensionBoosts < devVars.preInf.dimBoost.skipResets[1]) player.dimensionBoosts = devVars.preInf.dimBoost.skipResets[1]
   if (InfinityUpgrade.skipResetGalaxy.isBought && player.dimensionBoosts < 4) {
     player.dimensionBoosts = 4;
     if (player.galaxies === 0) player.galaxies = 1;

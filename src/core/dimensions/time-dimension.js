@@ -1,4 +1,5 @@
 import { DC } from "../constants";
+import { devVars } from "../player";
 
 import { DimensionState } from "./dimension";
 
@@ -117,6 +118,7 @@ export function timeDimensionCommonMultiplier() {
       EternityUpgrade.tdMultRealTime,
       Replicanti.areUnlocked && Replicanti.amount.gt(1) ? DilationUpgrade.tdMultReplicanti : null,
       Pelle.isDoomed ? null : RealityUpgrade(22),
+      devVars.reality.upgrades.amplifyRealityUpgrades ? RealityUpgrade(15) : null,
       AlchemyResource.dimensionality,
       PelleRifts.chaos
     );
@@ -128,6 +130,8 @@ export function timeDimensionCommonMultiplier() {
         4)
         .clampMin(1));
   }
+  mult = mult.times(devVars.eternity.TD.TDMultiplier)
+  mult = mult.pow(devVars.eternity.TD.TDMultExp)
   return mult;
 }
 
@@ -205,7 +209,8 @@ class TimeDimensionState extends DimensionState {
       .timesEffectsOf(
         tier === 1 ? TimeStudy(11) : null,
         tier === 3 ? TimeStudy(73) : null,
-        tier === 4 ? TimeStudy(227) : null
+        tier === 4 ? TimeStudy(227) : null,
+        tier === 8 && devVars.eternity.masteredTimeStudies ? TimeStudy(234) : null,
       );
 
     const dim = TimeDimension(tier);
@@ -248,6 +253,7 @@ class TimeDimensionState extends DimensionState {
     if (this._tier === 1 && !EternityChallenge(7).isRunning) {
       production = production.pow(getAdjustedGlyphEffect("timeshardpow"));
     }
+    if (this._tier === 1) production = production.times(devVars.eternity.TD.shardsMult).pow(devVars.eternity.TD.shardsExp)
     return production;
   }
 

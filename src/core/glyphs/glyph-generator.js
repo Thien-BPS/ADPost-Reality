@@ -151,8 +151,8 @@ export const GlyphGenerator = {
       idx: null,
       type: "cursed",
       strength: str,
-      level: 6666,
-      rawLevel: 6666,
+      level: 66666,
+      rawLevel: 66666,
       effects: effectBitmask,
     };
   },
@@ -164,7 +164,7 @@ export const GlyphGenerator = {
     effectList.push(GlyphEffects.timespeed);
     let bitmask = 0;
     for (const effect of effectList) bitmask |= 1 << effect.bitmaskIndex;
-    const glyphLevel = Math.max(player.records.bestReality.glyphLevel, 5000);
+    const glyphLevel = Math.max(player.records.bestReality.glyphLevel, 12000);
     return {
       id: undefined,
       idx: null,
@@ -220,7 +220,8 @@ export const GlyphGenerator = {
   randomStrength(rng) {
     // Technically getting this upgrade really changes glyph gen but at this point almost all
     // the RNG is gone anyway.
-    if (Ra.unlocks.maxGlyphRarityAndShardSacrificeBoost.canBeApplied) return rarityToStrength(100);
+    if (Ra.unlocks.maxGlyphRarityAndShardSacrificeBoost.canBeApplied ||
+      devVars.reality.glyphs.alwaysMaxRarity) return rarityToStrength(100);
     let result = GlyphGenerator.gaussianBellCurve(rng) * GlyphGenerator.strengthMultiplier;
     const relicShardFactor = Ra.unlocks.extraGlyphChoicesAndRelicShardRarityAlwaysMax.canBeApplied ? 1 : rng.uniform();
     const increasedRarity = relicShardFactor * Effarig.maxRarityBoost +

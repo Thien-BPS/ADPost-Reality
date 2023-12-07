@@ -1,4 +1,5 @@
 import { DC } from "../constants";
+import { devVars } from "../player";
 
 import { DimensionState } from "./dimension";
 
@@ -6,6 +7,7 @@ export function infinityDimensionCommonMultiplier() {
   let mult = new Decimal(ShopPurchase.allDimPurchases.currentMult)
     .timesEffectsOf(
       Achievement(75),
+      devVars.betterAchievements ? Achievement(76) : null,
       TimeStudy(82),
       TimeStudy(92),
       TimeStudy(162),
@@ -146,7 +148,8 @@ class InfinityDimensionState extends DimensionState {
       .timesEffectsOf(
         tier === 1 ? Achievement(94) : null,
         tier === 4 ? TimeStudy(72) : null,
-        tier === 1 ? EternityChallenge(2).reward : null
+        tier === 1 ? EternityChallenge(2).reward : null,
+        tier === 8 && devVars.eternity.masteredTimeStudies ? TimeStudy(234) : null,
       );
     mult = mult.times(Decimal.pow(this.powerMultiplier, Math.floor(this.baseAmount / 10)));
 
@@ -356,7 +359,7 @@ export const InfinityDimensions = {
   },
 
   get totalDimCap() {
-    return this.HARDCAP_PURCHASES + this.capIncrease;
+    return this.HARDCAP_PURCHASES + this.capIncrease + devVars.infinity.ID.hardCapAmount;
   },
 
   canBuy() {
@@ -410,6 +413,7 @@ export const InfinityDimensions = {
 
   get powerConversionRate() {
     const multiplier = PelleRifts.paradox.milestones[2].effectOrDefault(1);
-    return (7 + getAdjustedGlyphEffect("infinityrate") + PelleUpgrade.infConversion.effectOrDefault(0)) * multiplier;
+    return (devVars.infinity.ID.convRate + getAdjustedGlyphEffect("infinityrate")
+    + PelleUpgrade.infConversion.effectOrDefault(0)) * multiplier * devVars.infinity.ID.convRateMult;
   }
 };

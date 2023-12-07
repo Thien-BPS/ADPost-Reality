@@ -114,7 +114,7 @@ export const alchemyResources = {
     name: "Dimensionality",
     symbol: "ρ",
     isBaseResource: false,
-    effect: amount => Decimal.pow10(5 * amount),
+    effect: amount => Decimal.pow10(Math.max(5 * amount, 1)),
     tier: 2,
     uiOrder: 1,
     unlockedAt: 10,

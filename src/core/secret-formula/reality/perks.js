@@ -137,7 +137,7 @@ export const perks = {
     family: PERK_FAMILY.ETERNITY,
     get description() {
       return `Improve Time Study 122 to ${formatX(500)} Eternity Points and
-        Time Study 142 to ${formatX(DC.E500)} Infinity Points.
+        Time Study 142 to ${formatX(1e300)} Infinity Points.
         ${Pelle.isDoomed ? "" : `In addition, Time Study 132 also makes Replicanti ${format(3)} times faster.`}`;
     },
     layoutPosList: [69860, 79400, 81000, 80202, 78594, 52589],

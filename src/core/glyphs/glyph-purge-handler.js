@@ -1,7 +1,9 @@
+import { devVars } from "../player";
+
 // This actually deals with both sacrifice and refining, but I wasn't 100% sure what to call it
 export const GlyphSacrificeHandler = {
   // Anything scaling on sacrifice caps at this value, even though the actual sacrifice values can go higher
-  maxSacrificeForEffects: 1e100,
+  maxSacrificeForEffects: devVars.reality.glyphs.maxSacrifice,
   // This is used for glyph UI-related things in a few places, but is handled here as a getter which is only called
   // sparingly - that is, whenever the cache is invalidated after a glyph is sacrificed. Thus it only gets recalculated
   // when glyphs are actually sacrificed, rather than every render cycle.
@@ -13,7 +15,7 @@ export const GlyphSacrificeHandler = {
       (tot, type) => tot + Math.log10(Math.clampMin(player.reality.glyphs.sac[type], 1)), 0);
   },
   get canSacrifice() {
-    return RealityUpgrade(19).isBought;
+    return RealityUpgrade(19).isBought || devVars.reality.glyphs.forceSacrifice;
   },
   get isRefining() {
     return Ra.unlocks.unlockGlyphAlchemy.canBeApplied && AutoGlyphProcessor.sacMode !== AUTO_GLYPH_REJECT.SACRIFICE;
@@ -73,15 +75,16 @@ export const GlyphSacrificeHandler = {
     return Math.pow(level, 3) / 1e8;
   },
   // Refined glyphs give this proportion of their maximum attainable value from their level
-  glyphRefinementEfficiency: 0.05,
+  glyphRefinementEfficiency: devVars.reality.glyphs.refinementEfficiency,
   glyphRawRefinementGain(glyph) {
-    if (!Ra.unlocks.unlockGlyphAlchemy.canBeApplied) return 0;
+    if (!Ra.unlocks.unlockGlyphAlchemy.canBeApplied || !devVars.reality.glyphs.allowRefinement) return 0;
     const glyphMaxValue = this.levelRefinementValue(glyph.level);
     const rarityModifier = strengthToRarity(glyph.strength) / 100;
     return this.glyphRefinementEfficiency * glyphMaxValue * rarityModifier;
   },
   glyphRefinementGain(glyph) {
-    if (!Ra.unlocks.unlockGlyphAlchemy.canBeApplied || !generatedTypes.includes(glyph.type)) return 0;
+    if (!Ra.unlocks.unlockGlyphAlchemy.canBeApplied || !generatedTypes.includes(glyph.type)
+    || !devVars.reality.glyphs.allowRefinement) return 0;
     const resource = this.glyphAlchemyResource(glyph);
     if (!resource.isUnlocked) return 0;
     const glyphActualValue = this.glyphRawRefinementGain(glyph);
@@ -109,6 +112,7 @@ export const GlyphSacrificeHandler = {
     }
     const decoherence = AlchemyResource.decoherence.isUnlocked;
     if (!Ra.unlocks.unlockGlyphAlchemy.canBeApplied ||
+        !devVars.reality.glyphs.allowRefinement ||
         (this.glyphRefinementGain(glyph) === 0 && !decoherence) ||
         (decoherence && AlchemyResources.base.every(x => x.data.amount >= Ra.alchemyResourceCap))) {
       this.sacrificeGlyph(glyph, force);

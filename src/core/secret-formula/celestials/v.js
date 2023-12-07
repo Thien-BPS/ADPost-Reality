@@ -17,7 +17,7 @@ export const v = {
       id: 1,
       name: "Realities",
       resource: () => Currency.realities.value,
-      requirement: 10000,
+      requirement: 100000,
       format: x => formatInt(x),
       progress: () => Currency.realities.value / 10000,
     },
@@ -33,7 +33,7 @@ export const v = {
       id: 3,
       name: "Infinities",
       resource: () => Currency.infinitiesTotal.value,
-      requirement: 1e160,
+      requirement:1e160,
       format: x => format(x, 2),
       progress: () => emphasizeEnd(Currency.infinitiesTotal.value.pLog10() / 160),
     },
@@ -80,26 +80,46 @@ export const v = {
       id: 1,
       name: "AntiStellar",
       description: value => `Have ${formatInt(value)} total Galaxies from all types.`,
-      values: [4000, 4300, 4600, 4900, 5200, 5500],
+      values: () => {
+        if (devVars.celestials.v.lowerAchReqs && devVars.celestials.v.lowerAchReqsArray.includes(this.id)) {
+          return [2700, 2900, 3100, 3300, 3500, 3700]
+        }
+        return [4000, 4300, 4600, 4900, 5200, 5500];
+      },
       condition: () => V.isRunning,
       currentValue: () => Replicanti.galaxies.total + player.galaxies + player.dilation.totalTachyonGalaxies,
       formatRecord: x => formatInt(x),
-      shardReduction: tiers => Math.floor(300 * tiers),
+      shardReduction: tiers => {
+        if (devVars.celestials.v.lowerAchReqs && devVars.celestials.v.lowerAchReqsArray.includes(this.id)) {
+          return Math.floor(200 * tiers)
+        }
+        return Math.floor(300 * tiers);
+      },
       maxShardReduction: goal => goal - 4000,
-      perReductionStep: 3,
+      perReductionStep: 50,
       mode: V_REDUCTION_MODE.SUBTRACTION
     },
     {
       id: 2,
       name: "Se7en deadly matters",
       description: value => `Get ${format(Decimal.pow10(value))} Infinity Points in Eternity Challenge 7.`,
-      values: [6e5, 7.2e5, 8.4e5, 9.6e5, 1.08e6, 1.2e6],
+      values: () => {
+        if (devVars.celestials.v.lowerAchReqs && devVars.celestials.v.lowerAchReqsArray.includes(this.id)) {
+          return [3e5, 3.4e5, 3.8e5, 4.2e5, 4.6e5, 5e5]
+        }
+        return [6e5, 7.2e5, 8.4e5, 9.6e5, 1.08e6, 1.2e6]
+      },
       condition: () => V.isRunning && EternityChallenge(7).isRunning,
       currentValue: () => Currency.infinityPoints.value.log10(),
       formatRecord: x => format(Decimal.pow10(x), 2),
-      shardReduction: tiers => 1.2e5 * tiers,
+      shardReduction: tiers => {
+        if (devVars.celestials.v.lowerAchReqs && devVars.celestials.v.lowerAchReqsArray.includes(this.id)) {
+          return 3e4 * tiers
+        }
+        return 1.2e5 * tiers
+      },
       maxShardReduction: goal => goal - 6e5,
-      perReductionStep: DC.E1200,
+      perReductionStep: DC.E40000,
       mode: V_REDUCTION_MODE.DIVISION
     },
     {
@@ -107,33 +127,68 @@ export const v = {
       name: "Young Boy",
       description: value => `Get ${format(Decimal.pow10(value))} Antimatter in Eternity Challenge 12 without
         unlocking Time Dilation.`,
-      values: [400e6, 450e6, 500e6, 600e6, 700e6, 800e6],
+      values: () => {
+        if (devVars.celestials.v.lowerAchReqs && devVars.celestials.v.lowerAchReqsArray.includes(this.id)) {
+          return [2e8, 2.3e8, 2.6e8, 2.9e8, 3.2e8, 3.5e8]
+        }
+        return [400e6, 450e6, 500e6, 600e6, 700e6, 800e6]
+      },
       condition: () => V.isRunning && EternityChallenge(12).isRunning && !PlayerProgress.dilationUnlocked(),
       currentValue: () => Currency.antimatter.value.log10(),
       formatRecord: x => format(Decimal.pow10(x)),
-      shardReduction: tiers => 50e6 * tiers,
+      shardReduction: tiers => {
+        if (devVars.celestials.v.lowerAchReqs && devVars.celestials.v.lowerAchReqsArray.includes(this.id)) {
+          return 3e7 * tiers
+        }
+        return 50e6 * tiers
+      },
       maxShardReduction: goal => goal - 400e6,
-      perReductionStep: DC.E500000,
+      perReductionStep: () => {
+        if (devVars.celestials.v.lowerAchReqs && devVars.celestials.v.lowerAchReqsArray.includes(this.id)) {
+          return DC.E2E7
+        }
+        return DC.E500000;
+      },
       mode: V_REDUCTION_MODE.DIVISION
     },
     {
       id: 4,
       name: "Eternal Sunshine",
       description: value => `Get ${format(Decimal.pow10(value))} Eternity Points.`,
-      values: [7000, 7600, 8200, 8800, 9400, 10000],
+      values: () => {
+        if (devVars.celestials.v.lowerAchReqs && devVars.celestials.v.lowerAchReqsArray.includes(this.id)) {
+          return [5000, 5400, 5800, 6200, 6600, 7000];
+        }
+        return [7000, 7600, 8200, 8800, 9400, 10000];
+      },
       condition: () => V.isRunning,
       currentValue: () => Currency.eternityPoints.value.log10(),
       formatRecord: x => format(Decimal.pow10(x), 2),
-      shardReduction: tiers => 600 * tiers,
+      shardReduction: tiers => {
+        if (devVars.celestials.v.lowerAchReqs && devVars.celestials.v.lowerAchReqsArray.includes(this.id)) {
+          return 400 * tiers
+        }
+        return 600 * tiers;
+      },
       maxShardReduction: goal => goal - 7000,
-      perReductionStep: 1e6,
+      perReductionStep: () => {
+        if (devVars.celestials.v.lowerAchReqs && devVars.celestials.v.lowerAchReqsArray.includes(this.id)) {
+          return 1e300;
+        }
+        return 1e6;
+      },
       mode: V_REDUCTION_MODE.DIVISION
     },
     {
       id: 5,
       name: "Matterception",
       description: value => `Get ${formatInt(value)} Dimension Boosts while Dilated and inside Eternity Challenge 5.`,
-      values: [51, 52, 53, 54, 55, 56],
+      values: () => {
+        if (devVars.celestials.v.lowerAchReqs && devVars.celestials.v.lowerAchReqsArray.includes(this.id)) {
+          return [47, 48, 49, 50, 51, 52];
+        }
+        [51, 52, 53, 54, 55, 56]
+        },
       condition: () => V.isRunning && player.dilation.active && EternityChallenge(5).isRunning,
       currentValue: () => DimBoost.purchasedBoosts,
       formatRecord: x => formatInt(x),

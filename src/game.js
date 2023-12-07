@@ -639,7 +639,7 @@ export function gameLoop(passDiff, options = {}) {
       [...Tab.dimensions.subtabs].reverse().find(t => !t.isPermanentlyHidden).show(true);
     }
   }
-
+  player.dev = devVars
   EventHub.dispatch(GAME_EVENT.GAME_TICK_AFTER);
   GameUI.update();
   player.lastUpdate = thisUpdate;
@@ -1083,21 +1083,30 @@ export function browserCheck() {
   return supportedBrowsers.test(navigator.userAgent);
 }
 
+export const gotError = {}
+
 export function checkAndLoadSave() {
+  /* eslint-disable no-console */
+  console.log("Loading save...")
   try {
     GameStorage.load()
   }
-  catch({ name, message }) {
-    console.error("Error while loading savefile, resetting save. Found error:");
-    console.error(name, message)
+  catch(error) {
     GameStorage.hardReset();
     GameStorage.save();
     dev.forceCloudSave();
     GlobalErrorHandler.cleanStart = true;
-    player.gotError.type = name;
-    player.gotError.catched = true;
-    window.reload();
+    console.warn("Error while loading savefile, resetting save. Found error:");
+    console.warn(error)
+    gotError.type = error;
+    gotError.catched = true;
+    // window.reload();
   }
+  finally {
+    console.log("The game should be loaded successfully regardless of any save issues.")
+    console.log("If it still didn't load, contact the developer.")
+  }
+  /* eslint-enable no-console */
 }
 
 export function allowRGPlusFeat() {

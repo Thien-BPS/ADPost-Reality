@@ -1,3 +1,9 @@
+function improvedMemoryEffects(pets) {
+  let x = devVars.celestials.ra.improveMemoryEffects && devVars.celestials.ra.effectImprovementArray.includes(pets)
+  if (x !== (false || true)) return false
+  else return x
+}
+
 export const ra = {
   pets: {
     teresa: {
@@ -48,7 +54,6 @@ export const ra = {
       pet: "teresa",
       level: 1,
       displayIcon: `<span class="fas fa-atom"></span>`,
-      disabledByPelle: true
     },
     chargedInfinityUpgrades: {
       id: 1,
@@ -119,7 +124,7 @@ export const ra = {
     effarigXP: {
       id: 9,
       reward: "All Memory Chunks produce more Memories based on highest Glyph level",
-      effect: () => 1 + player.records.bestReality.glyphLevel / 7000,
+      effect: () => 1 + player.records.bestReality.glyphLevel / (improvedMemoryEffects(this.pet) ? 9 : 7000),
       pet: "effarig",
       level: 5,
       displayIcon: `<span class="fas fa-clone"></span>`
@@ -141,7 +146,7 @@ export const ra = {
     relicShardGlyphLevelBoost: {
       id: 12,
       reward: "Glyph level is increased based on Relic Shards gained",
-      effect: () => 100 * Math.pow(Math.log10(Math.max(Effarig.shardsGained, 1)), 2),
+      effect: () => (improvedMemoryEffects(this.pet) ? 400 : 100) * Math.pow(Math.log10(Math.max(Effarig.shardsGained, 1)), 2),
       pet: "effarig",
       level: 15,
       displayIcon: `<span class="fas fa-fire"></span>`
@@ -167,7 +172,7 @@ export const ra = {
       id: 15,
       reward: "Stored game time is amplified and you can store more real time, increasing with Nameless levels",
       effects: {
-        gameTimeAmplification: () => Math.pow(20, Math.clampMax(Ra.pets.enslaved.level, Ra.levelCap)),
+        gameTimeAmplification: () => Math.pow((improvedMemoryEffects(this.pet) ? 55 : 20), Math.clampMax(Ra.pets.enslaved.level, Ra.levelCap)),
         realTimeCap: () => 1000 * 3600 * Ra.pets.enslaved.level,
       },
       pet: "enslaved",
@@ -178,7 +183,7 @@ export const ra = {
     enslavedXP: {
       id: 16,
       reward: "All Memory Chunks produce more Memories based on total time played",
-      effect: () => 1 + Math.log10(player.records.totalTimePlayed) / 200,
+      effect: () => 1 + Math.log10(player.records.totalTimePlayed) / (improvedMemoryEffects(this.pet) ? 4 : 200),
       pet: "enslaved",
       level: 5,
       displayIcon: `<span class="fas fa-stopwatch"></span>`
@@ -202,7 +207,9 @@ export const ra = {
     peakGamespeedDT: {
       id: 19,
       reward: "Gain more Dilated Time based on peak game speed in each Reality",
-      effect: () => Math.max(Math.pow(Math.log10(player.celestials.ra.peakGamespeed) - 90, 3), 1),
+      effect: () => Math.max(Math.pow(
+        Math.log10(player.celestials.ra.peakGamespeed) - (improvedMemoryEffects(this.pet) ? 0 : 90),
+        (improvedMemoryEffects(this.pet) ? 8 : 3)), 1),
       pet: "enslaved",
       level: 15,
       displayIcon: `<span class="fas fa-tachometer-alt"></span>`,
@@ -228,7 +235,7 @@ export const ra = {
       pet: "v",
       level: 1,
       displayIcon: `<span class="fas fa-sync-alt"></span>`,
-      disabledByPelle: true
+      disabledByPelle: () => improvedMemoryEffects(this.pet) ? false : true
     },
     autoUnlockDilation: {
       id: 22,
@@ -241,7 +248,7 @@ export const ra = {
     vXP: {
       id: 23,
       reward: "All Memory Chunks produce more Memories based on total Celestial levels.",
-      effect: () => 1 + Ra.totalPetLevel / 50,
+      effect: () => 1 + (improvedMemoryEffects(this.pet) ? Ra.totalPetLevel * 41 : Ra.totalPetLevel / 50),
       pet: "v",
       level: 5,
       displayIcon: `<span class="fas fa-book"></span>`
@@ -272,7 +279,7 @@ export const ra = {
       pet: "v",
       level: 10,
       displayIcon: `<span class="fas fa-university"></span>`,
-      disabledByPelle: true
+      disabledByPelle: () => improvedMemoryEffects(this.pet) ? false : true
     },
     achievementTTMult: {
       id: 26,
@@ -285,12 +292,12 @@ export const ra = {
     },
     achievementPower: {
       id: 27,
-      reward: () => `Achievement multiplier is raised ${formatPow(1.5, 1, 1)}`,
-      effect: 1.5,
+      reward: () => `Achievement multiplier is raised ${formatPow(improvedMemoryEffects(this.pet) ? 2.1 : 1.5, 1, 1)}`,
+      effect: () => improvedMemoryEffects(this.pet) ? 2.1 : 1.5,
       pet: "v",
       level: 25,
       displayIcon: `<i class="fab fa-buffer"></i>`,
-      disabledByPelle: true
+      disabledByPelle: () => improvedMemoryEffects(this.pet) ? false : true
     }
   }
 };

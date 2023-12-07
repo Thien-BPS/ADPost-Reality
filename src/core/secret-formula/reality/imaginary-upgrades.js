@@ -1,4 +1,5 @@
 import { DC } from "../../constants";
+// import { devVars } from "../../player";
 
 const rebuyable = props => {
   props.cost = () => props.initialCost * Math.pow(props.costMult, player.reality.imaginaryRebuyables[props.id]);
@@ -56,8 +57,8 @@ export const imaginaryUpgrades = [
     id: 6,
     initialCost: 1e4,
     costMult: 500,
-    description: () => `Increase the Reality Machine cap by ${formatX(1e150)}`,
-    effect: 1e150,
+    description: () => `Increase the Reality Machine cap by ${devVars.reality.upgrades.amplifyImaginaryUpgrades ? formatX(1e250) : formatX(1e100)}`,
+    effect: 1e250,
     formatEffect: value => `${formatX(value)}`,
     isDecimal: true
   }),
@@ -66,7 +67,7 @@ export const imaginaryUpgrades = [
     id: 7,
     initialCost: 2e5,
     costMult: 500,
-    description: () => `Delay Glyph Instability starting level by ${formatInt(500)}`,
+    description: () => `Delay Glyph Instability starting level by ${formatInt(devVars.reality.upgrades.amplifyImaginaryUpgrades ? 500 : 200)}`,
     effect: 500,
     formatEffect: value => `+${formatInt(value)} levels`
   }),
@@ -86,7 +87,7 @@ export const imaginaryUpgrades = [
     initialCost: 1e9,
     costMult: 1000,
     description: () => `Increase Galaxy strength`,
-    effect: 0.1,
+    effect: 0.12,
     formatEffect: value => `+${formatPercents(value)}`,
   }),
   rebuyable({
@@ -95,7 +96,7 @@ export const imaginaryUpgrades = [
     initialCost: 8e9,
     costMult: 2000,
     description: () => `Increase Singularity gain`,
-    effect: 5,
+    effect: 25,
     formatEffect: value => `${formatX(1 + value, 2)}`
   }),
   {
@@ -108,7 +109,7 @@ export const imaginaryUpgrades = [
     checkRequirement: () => player.celestials.effarig.relicShards >= 1e90,
     checkEvent: GAME_EVENT.REALITY_RESET_AFTER,
     description: "Time Dimension power based on total antimatter",
-    effect: () => 1 + Math.log10(player.records.totalAntimatter.log10()) / 75,
+    effect: () => 1 + Math.log10(player.records.totalAntimatter.log10()) / 100,
     formatEffect: value => `${formatPow(value, 0, 4)}`,
     isDisabledInDoomed: true
   },
@@ -123,7 +124,7 @@ export const imaginaryUpgrades = [
       gainedGlyphLevel().actualLevel >= 12000,
     checkEvent: GAME_EVENT.REALITY_RESET_BEFORE,
     description: "Gain free Dimboosts based on Imaginary rebuyable count",
-    effect: () => 3e5 * ImaginaryUpgrades.totalRebuyables,
+    effect: () => (devVars.reality.upgrades.amplifyImaginaryUpgrades ? 3e5 : 2e4) * ImaginaryUpgrades.totalRebuyables,
     formatEffect: value => `${format(value, 1)}`,
     isDisabledInDoomed: true
   },
@@ -139,7 +140,9 @@ export const imaginaryUpgrades = [
       MachineHandler.uncappedRM.times(simulatedRealityCount(false) + 1).gte(Number.MAX_VALUE),
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
     description: "Increase Imaginary Machine Cap based on Imaginary Upgrades purchased",
-    effect: () => 1 + ImaginaryUpgrades.totalRebuyables / 8 + ImaginaryUpgrades.totalSinglePurchase,
+    effect: () => devVars.reality.upgrades.amplifyImaginaryUpgrades
+    ? 1 + (ImaginaryUpgrades.totalRebuyables * 8) * ImaginaryUpgrades.totalSinglePurchase
+    : 1 + ImaginaryUpgrades.totalRebuyables / 8 + ImaginaryUpgrades.totalSinglePurchase,
     formatEffect: value => `${formatX(value, 2, 1)}`,
     isDisabledInDoomed: true
   },
@@ -152,8 +155,8 @@ export const imaginaryUpgrades = [
     hasFailed: () => false,
     checkRequirement: () => EternityChallenge(5).isRunning && Tickspeed.perSecond.exponent >= 7.5e10,
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
-    description: () => `Raise all Dimension per-purchase multipliers to ${formatPow(2, 0, 1)}`,
-    effect: 2,
+    description: () => `Raise all Dimension per-purchase multipliers to ${formatPow((devVars.reality.upgrades.amplifyImaginaryUpgrades ? 2.6 : 1.5), 0, 1)}`,
+    effect: () => devVars.reality.upgrades.amplifyImaginaryUpgrades ? 2.6 : 1.5,
     isDisabledInDoomed: true
   },
   {
@@ -172,7 +175,7 @@ export const imaginaryUpgrades = [
     // - Purchasing any TD with any amount of EC7 completions (edge case: acceptable within EC1 or EC10)
     // - Entering EC7 with any amount of purchased TD
     description: () => `${
-      Pelle.isDoomed ? "Unlock" : "Convert Antimatter Dimensions to Continuum and unlock"
+      (Pelle.isDoomed || devVars.reality.upgrades.disableContinuum) ? "Unlock" : "Convert Antimatter Dimensions to Continuum and unlock"
     } Lai'tela, Celestial of Dimensions`,
   },
   {
@@ -207,9 +210,13 @@ export const imaginaryUpgrades = [
     checkRequirement: () => Replicanti.galaxies.total + player.galaxies +
       player.dilation.totalTachyonGalaxies >= 80000,
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
-    effect: () => Math.clampMin(Math.log10(Currency.imaginaryMachines.value) / 3.1, 1),
+    effect: () => devVars.reality.amplifyImaginaryUpgrades
+    ? Math.clampMin(Math.log10(Currency.imaginaryMachines.value) / 3.1, 1)
+    : 1,
     formatEffect: value => `${formatX(value, 2, 1)}`,
-    description: "Unlock the 4th Dark Matter Dimension and Distant + Remote starts much later based on your Imaginary Machines",
+    description: () => `Unlock the 4th Dark Matter Dimension${ devVars.reality.upgrades.amplifyImaginaryUpgrades
+      ? " and Distant + Remote starts much later based on your Imaginary Machines"
+      : ""}`,
   },
   {
     name: "Deterministic Radiation",
@@ -235,8 +242,8 @@ export const imaginaryUpgrades = [
     checkRequirement: () => Laitela.matterExtraPurchaseFactor >= 2,
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
     description: () => `Unlock Autobuyers for repeatable Imaginary Upgrades and generate Imaginary Machines
-      ${formatInt(10)} times faster`,
-    effect: 10,
+      ${formatInt(100)} times faster`,
+    effect: 100,
     isDisabledInDoomed: true
   },
   {
@@ -251,7 +258,7 @@ export const imaginaryUpgrades = [
     canLock: true,
     lockEvent: "enable Continuum",
     description: "Annihilation multiplier gain is improved based on Imaginary Machines",
-    effect: () => Math.clampMin(Math.pow(Math.log10(Currency.imaginaryMachines.value) - 10, 3), 1),
+    effect: () => Math.clampMin(Math.pow(Math.log10(Currency.imaginaryMachines.value) - 2.5, 3), 1),
     formatEffect: value => `${formatX(value, 2, 1)}`,
     isDisabledInDoomed: true
   },
@@ -301,8 +308,8 @@ export const imaginaryUpgrades = [
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
     canLock: true,
     // Three locking events: uninvert, discharge, and entering (but not auto-completing) EC12
-    description: "Increase free Dimboost strength based on Singularity count",
-    effect: () => Decimal.pow(player.celestials.laitela.singularities, 300),
+    description: () => `Increase free ${devVars.reality.upgrades.amplifyImaginaryUpgrades ? "and normal" : ""} Dimboost strength based on Singularity count`,
+    effect: () => Decimal.pow(player.celestials.laitela.singularities, (devVars.reality.upgrades.amplifyImaginaryUpgrades ? 230 : 300)),
     formatEffect: value => `${formatX(value, 2, 1)}`,
     isDisabledInDoomed: true
   },

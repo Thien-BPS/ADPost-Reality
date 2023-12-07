@@ -1,4 +1,6 @@
 import { DC } from "../constants";
+import { Achievement } from "../globals";
+import { devVars } from "../player";
 
 import { DimensionState } from "./dimension";
 
@@ -120,6 +122,9 @@ function applyNDMultipliers(mult, tier) {
         TimeStudy(234)
       );
   }
+  if (tier === 3 && devVars.betterAchievements) {
+    multiplier = multiplier.timesEffectOf(Achievement(68))
+  }
   if (tier === 8) {
     multiplier = multiplier.times(Sacrifice.totalBoost);
   }
@@ -130,10 +135,11 @@ function applyNDMultipliers(mult, tier) {
     tier <= 4 ? Achievement(64) : null,
     tier < 8 ? TimeStudy(71) : null,
     tier === 8 ? TimeStudy(214) : null,
-    tier > 1 && tier < 8 ? InfinityChallenge(8).reward : null
+    tier > 1 && tier < 8 ? InfinityChallenge(8).reward : null,
+    (tier === 2 || tier === 8) && devVars.betterAchievements ? Achievement(71) : null
   );
   if (Achievement(43).isUnlocked) {
-    multiplier = multiplier.times(1 + tier / 100);
+    multiplier = multiplier.times(1 + tier / (devVars.betterAchievements ? 10 : 100));
   }
 
   multiplier = multiplier.clampMin(1);
@@ -578,7 +584,7 @@ class AntimatterDimensionState extends DimensionState {
 
   get productionPerSecond() {
     const tier = this.tier;
-    if (Laitela.isRunning && tier > Laitela.maxAllowedDimension) return DC.D0;
+    if (Laitela.isRunning && tier > Laitela.maxAllowedDimension) return new Decimal(1); //DC.D0;
     let amount = this.totalAmount;
     if (NormalChallenge(12).isRunning) {
       if (tier === 2) amount = amount.pow(1.6);
@@ -599,7 +605,7 @@ class AntimatterDimensionState extends DimensionState {
       }
     }
     production = production.min(this.cappedProductionInNormalChallenges);
-    return production;
+    return production //new Decimal(1000);
   }
 }
 

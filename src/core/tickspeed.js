@@ -1,5 +1,4 @@
 import { DC } from "./constants";
-import { devVars } from "./player";
 
 export function effectiveBaseGalaxies() {
   // Note that this already includes the "50% more" active path effect
@@ -167,13 +166,17 @@ export const Tickspeed = {
   },
 
   get baseValue() {
-    return DC.E3.timesEffectsOf(
+    let test = new Decimal(1000)
+    test = test.timesEffectsOf(
       Achievement(36),
       Achievement(45),
       Achievement(66),
       Achievement(83)
     )
-      .times(getTickSpeedMultiplier().pow(this.totalUpgrades * devVars.boughtTickspeedMult));
+
+    test = test.times(getTickSpeedMultiplier().pow(this.totalUpgrades * devVars.preInf.boughtTickspeedMult));
+    return test;
+    // new Decimal(1000).times(getTickSpeedMultiplier().pow(this.totalUpgrades /* * devVars.boughtTickspeedMult*/))
   },
 
   get totalUpgrades() {
@@ -210,12 +213,18 @@ export const FreeTickspeed = {
     if (Enslaved.has(ENSLAVED_UNLOCKS.FREE_TICKSPEED_SOFTCAP)) {
       softcap += 100000;
     }
-    return softcap;
+    return softcap += devVars.eternity.TD.freeTSSoftcapExtend;
+  },
+  
+  get tickMultiplier() {
+    return 1 + (devVars.eternity.TD.forceFreeTSThreshold[0] 
+    ? devVars.eternity.TD.forceFreeTSThreshold[1]
+    : Effects.min(1.33, TimeStudy(171)) - 1) *
+      Math.max(getAdjustedGlyphEffect("cursedtickspeed"), 1);
   },
 
   fromShards(shards) {
-    const tickmult = (1 + (Effects.min(1.33, TimeStudy(171)) - 1) *
-      Math.max(getAdjustedGlyphEffect("cursedtickspeed"), 1));
+    const tickmult = FreeTickspeed.tickMultiplier
     const logTickmult = Math.log(tickmult);
     const logShards = shards.ln();
     const uncapped = Math.max(0, logShards / logTickmult);

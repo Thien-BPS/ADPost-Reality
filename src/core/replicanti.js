@@ -166,7 +166,7 @@ export function totalReplicantiSpeedMult(overCap) {
 export function replicantiCap() {
   return EffarigUnlock.infinity.canBeApplied
     ? Currency.infinitiesTotal.value
-      .pow(TimeStudy(31).isBought ? 120 : 30)
+      .pow(TimeStudy(31).isBought ? (devVars.eternity.masteredTimeStudies ? 1080 : 120) : 30)
       .clampMin(1)
       .times(Decimal.NUMBER_MAX_VALUE)
     : Decimal.NUMBER_MAX_VALUE;
@@ -348,7 +348,7 @@ export const ReplicantiUpgrade = {
 
     get cap() {
       // Chance never goes over 100% unless you have that timestudy.
-      return (devVars.replicanti.disableChanceCap || TimeStudy(11).isBought ) ? Number.MAX_VALUE : 1;
+      return (devVars.replicanti.disableChanceCap || (devVars.eternity.masteredTimeStudies && TimeStudy(213).isBought) ) ? Number.MAX_VALUE : 1;
     }
 
     get isCapped() {
@@ -385,7 +385,7 @@ export const ReplicantiUpgrade = {
     set value(value) { player.replicanti.interval = value; }
 
     get nextValue() {
-      return Math.max(this.value * 0.9, this.cap);
+      return Math.max(this.value * 0.8, this.cap);
     }
 
     get cost() {
@@ -395,10 +395,16 @@ export const ReplicantiUpgrade = {
     get baseCost() { return player.replicanti.intervalCost; }
     set baseCost(value) { player.replicanti.intervalCost = value; }
 
-    get costIncrease() { return 1e10; }
+    get costIncrease() { return (devVars.replicanti.disableIntervalCap
+      || (devVars.reality.upgrades.amplifyRealityUpgrades && RealityUpgrade(23).isBought)
+      && this.value < 1)
+      ? 1.79e-308
+      : 1e10 }
 
     get cap() {
-      return (devVars.replicanti.disableIntervalCap || RealityUpgrade(23).isBought) ? 0 : Effects.min(50, TimeStudy(22));
+      return (devVars.replicanti.disableIntervalCap || (devVars.reality.upgrades.amplifyRealityUpgrades && RealityUpgrade(23).isBought))
+      ? Number.MIN_VALUE
+      : Effects.min(50, TimeStudy(22));
     }
 
     get isCapped() {

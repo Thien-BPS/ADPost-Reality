@@ -7,100 +7,11 @@ import { deepmergeAll } from "@/utility/deepmerge";
 import { GlyphTypes } from "./glyph-effects";
 
 // This is actually reassigned when importing saves
+
 // eslint-disable-next-line prefer-const
 window.player = {
   antimatter: DC.E1,
-  dev: {
-    // This dev variable is used for easier devlopement.
-    preInf: {
-      allowSacrifice: false,
-      sacrificeExp: 1,
-      boughtTickspeedMult: 1,
-      dimBoost: {
-        dimBoostMult: new Decimal(1),
-        dimBoostPower: new Decimal(1),
-        limitDimBoosts: [false, 5],
-        imaginaryBoosts: 0,
-        imaginaryBoostsMult: 1,
-        skipResets: [false, 5],
-        keepDims
-      },
-      galaxy: {
-        distantGalaxyStart: 0,
-        remoteGalaxyStart: 0,
-        galaxyScaleAdd: true,
-        allowGalaxies: true,
-      },
-    },
-    infinity: {},
-    replicanti: {
-      replicateMultiplier: new Decimal(1),
-      replicatePowerMult: new Decimal(1),
-      disableChanceCap: false,
-      allowChanceAuto: false,
-      disableIntervalCap: false,
-      allowIntervalAuto: false,
-      distantGalaxyDisable: false,
-      remoteGalaxyDisable: false,
-      maxGalaxyExtra: 0,
-      allowMaxGalaxyAuto: false,
-      forceUnlock: false,
-      disableCap: false,
-    },
-    eternity: {
-      timeDims: {},
-      timeStudy: {},
-      breakEternity: {},
-    },
-    dilation: {
-      galaxyThreshold: 0.35,
-      galaxyThresholdRoot: 1,
-      dtMult: new Decimal(1),
-      dtPower: new Decimal(1),
-      tachyonPower: new Decimal(1),
-      tachyonGainMult: new Decimal(1),
-    },
-    reality: {
-      perks: {},
-      alchemy: {},
-      upgrades: {},
-      glyphs: {},
-      blackHole: {},
-    },
-    celestials: {
-      teresa: {},
-      effarig: {},
-      enslaved: {},
-      v: {},
-      ra: {},
-      laitela: {},
-      pelle: {},
-    },
-    multiverse: {
-      celestials: {
-        thien: {},
-        knull: {},
-        hevi: {},
-        cante: {},
-      },
-      upgrades: {},
-      godlyDims: {},
-    },
-    quantum: {
-      quarks: {},
-      gluons: {},
-      photons: {},
-      nuclei: {},
-      pairedChalls: {},
-      nanofield: {},
-      treeOfDecay: {},
-      bigRip: {},
-    },
-    ascension: {
-      ascensionState: false,
-    },
-    omnisity: {},
-  },
+  dev: null,
   dimensions: {
     antimatter: Array.range(0, 8).map(() => ({
       bought: 0,
@@ -1006,7 +917,170 @@ window.player = {
   },
 };
 
-export let devVars = player.dev
+export let devVars = player.dev ?? {
+    // This dev variable is used for easier devlopement.
+    preInf: {
+      allowSacrifice: false,
+      sacrificeExp: 1,
+      boughtTickspeedMult: 1,
+      dimBoost: {
+        dimBoostMult: new Decimal(1),
+        dimBoostPower: new Decimal(1),
+        limitDimBoosts: [false, 5],
+        imaginaryBoosts: 0,
+        imaginaryBoostsMult: 1,
+        skipResets: [false, 5],
+        keepDims: false,
+      },
+      galaxy: {
+        distantGalaxyStart: 0,
+        remoteGalaxyStart: 0,
+        galaxyScaleAdd: true,
+        allowGalaxies: true,
+      },
+    },
+    infinity: {
+      betterBreakUpgrades: false,
+      betterNormalUpgrades: false,
+      ID: {
+        convRate: 7,
+        convRateMult: 1,
+        hardCapAmount: 2e6
+      }
+    },
+    replicanti: {
+      replicateMultiplier: new Decimal(1),
+      replicatePowerMult: new Decimal(1),
+      disableChanceCap: false,
+      allowChanceAuto: false,
+      disableIntervalCap: false,
+      allowIntervalAuto: false,
+      distantGalaxyDisable: false,
+      remoteGalaxyDisable: false,
+      maxGalaxyExtra: 0,
+      allowMaxGalaxyAuto: false,
+      forceUnlock: false,
+      disableCap: false,
+    },
+    eternity: {
+      TD: {
+        TDMultiplier: new Decimal(1),
+        TDMultExp: new Decimal(1),
+        shardsMult: new Decimal(1),
+        shardsExp: new Decimal(1),
+        freeTSSoftcapExtend: 0,
+        forceFreeTSThreshold: [false, 0.33],
+      },
+      masteredTimeStudies: false,
+      breakEternity: {},
+    },
+    dilation: {
+      galaxyThreshold: 0.35,
+      galaxyThresholdRoot: 1,
+      dtMult: new Decimal(1),
+      dtPower: new Decimal(1),
+      tachyonPower: new Decimal(1),
+      tachyonGainMult: new Decimal(1),
+    },
+    reality: {
+      perks: {},
+      alchemy: {
+        uncappedAllResources: false,
+        uncappedResources: { "uncapped":false, "alchemy":[0] },
+      },
+      upgrades: {
+        disableContinuum: false,
+        amplifyRealityUpgrades: false,
+        amplifyImaginaryUpgrades: false,
+      },
+      glyphs: {
+        maxSacrifice: 1e100,
+        forceSacrifice: false,
+        refinementEfficiency: 0.05,
+        allowRefinement: false,
+        alwaysMaxRarity: false,
+        betterEffectFormula: false,
+      },
+      blackHole: {},
+    },
+    celestials: {
+      teresa: {
+        lowerCost: false,
+        multiplierOverride: [false, new Decimal("1e10000000000")]
+      },
+      effarig: {},
+      enslaved: {},
+      v: {
+        lowerReqs: false,
+        lowerAchReqs: false,
+        lowerAchReqsArray: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+      },
+      ra: {
+        improveMemoryEffects: false,
+        effectImprovementArray: ["teresa", "effarig", "enslaved", "v"]
+      },
+      laitela: {
+        improveUnlimitedMilestones: false,
+        improveLimitedMilestones: false,
+        improveExternalMilestones: false,
+        singularityMult: 1,
+        darkEnergyMult: 1,
+      },
+      pelle: {
+        reduceRiftMilestoneReqs: false,
+        reduceRiftMilestoneArray: ["vacuum", "decay", "chaos", "recursion", "paradox"],
+        improveRiftEffect: false,
+        riftsEffectArray: ["vacuum", "decay", "chaos", "recursion", "paradox"],
+      },
+    },
+    multiverse: {
+      celestials: {
+        thien: {},
+        knull: {},
+        hevi: {},
+        cante: {},
+      },
+      upgrades: {},
+      godlyDims: {},
+    },
+    quantum: {
+      quarks: {},
+      gluons: {},
+      photons: {},
+      nuclei: {},
+      pairedChalls: {},
+      nanofield: {},
+      treeOfDecay: {},
+      bigRip: {},
+    },
+    ascension: {
+      ascensionState: false,
+    },
+    omnisity: {},
+    betterAchievements: false,
+    forceBreak: () => {
+      player.break = true
+      EventHub.dispatch(GAME_EVENT.BREAK_INFINITY)
+    },
+    completeAllChallenges: () => {
+      player.challenge.normal.completedBits = 2 ** 14 - 1;
+      player.challenge.infinity.completedBits = 2 ** 9 - 1;
+      player.eternityChalls = {
+        eterc1: 5,
+        eterc2: 5,
+        eterc3: 5,
+        eterc4: 5,
+        eterc5: 5,
+        eterc6: 5,
+        eterc7: 5,
+        eterc8: 5,
+        eterc9: 5,
+        eterc10: 5,
+        eterc11: 5,
+        eterc12: 5,
+      }
+    }
+}
 
 export const Player = {
   defaultStart: deepmergeAll([{}, player]),
@@ -1151,7 +1225,7 @@ export function guardFromNaNValues(obj) {
             throw new Error("Non-Number assignment to Number player property");
           }
           if (!isFinite(newValue)) {
-            throw new Error("NaN player property assignment");
+            throw new Error("NaN/Infinity player property assignment");
           }
           value = newValue;
         }
@@ -1171,7 +1245,7 @@ export function guardFromNaNValues(obj) {
             throw new Error("Non-Decimal assignment to Decimal player property");
           }
           if (!isFinite(newValue.mantissa) || !isFinite(newValue.exponent)) {
-            throw new Error("NaN player property assignment");
+            throw new Error("NaN/Infinity player property assignment");
           }
           value = newValue;
         }

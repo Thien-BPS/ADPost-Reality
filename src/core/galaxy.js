@@ -94,7 +94,7 @@ export class Galaxy {
     if (NormalChallenge(8).isRunning || InfinityChallenge(7).isRunning) return false;
     if (player.records.thisInfinity.maxAM.gt(Player.infinityGoal) &&
        (!player.break || Player.isInAntimatterChallenge)) return false;
-    if (!devVars.galaxy.allowGalaxy) return false;
+    if (devVars.preInf.galaxy.allowGalaxy) return false;
     return true;
   }
 
@@ -104,7 +104,7 @@ export class Galaxy {
     if (InfinityChallenge(7).isRunning) return "Locked (Infinity Challenge 7)";
     if (InfinityChallenge(1).isRunning) return "Locked (Infinity Challenge 1)";
     if (NormalChallenge(8).isRunning) return "Locked (8th Antimatter Dimension Autobuyer Challenge)";
-    if (!devVars.preInf.galaxy.allowGalaxy) return "Locked (Devloper Env. Variable)"
+    if (devVars.preInf.galaxy.allowGalaxy) return "Locked (Devloper Env. Variable)"
     return null;
   }
 

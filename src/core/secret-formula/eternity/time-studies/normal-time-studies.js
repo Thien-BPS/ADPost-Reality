@@ -8,7 +8,7 @@ const thisInfinityMult = thisInfinity => {
 };
 const passiveIPMult = () => {
   const isEffarigLimited = Effarig.isRunning && Effarig.currentStage === EFFARIG_STAGES.ETERNITY;
-  const normalValue = Perk.studyPassive.isBought ? 1e50 : 1e25;
+  const normalValue = Perk.studyPassive.isBought ? 1e300 : 1e25;
   return isEffarigLimited
     ? Math.min(normalValue, Effarig.eternityCap.toNumber())
     : normalValue;
@@ -45,7 +45,7 @@ export const normalTimeStudies = [
       const secondPart = tickspeed.pow(0.0003).times(0.05);
       return firstPart.plus(secondPart).reciprocate();
     },
-    cap: DC.E2500,
+    cap: () => devVars.eternity.masteredTimeStudies ? DC.E2_2E6 : DC.E2500,
     formatEffect: value => formatX(value, 2, 1)
   },
   {
@@ -55,7 +55,9 @@ export const normalTimeStudies = [
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     description: () => `Improve Replicanti multiplier formula to
       (log2(x)${formatPow(2)})+x${formatPow(0.032, 3, 3)}`,
-    effect: () => Replicanti.amount.pow(0.032),
+    effect: () => devVars.eternity.masteredTimeStudies
+    ? Replicanti.amount.pow(0.0665)
+    : Replicanti.amount.pow(0.032),
     // This is a special case because the study itself is *added* to the existing formula, but it makes more sense
     // to display a multiplicative increase just like every other study. We need to do the calculation in here in order
     // to properly show only the effect of this study and nothing else
@@ -70,23 +72,23 @@ export const normalTimeStudies = [
     cost: 2,
     requirement: [11],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
-    description: () => `Base Replicanti interval limit ${formatInt(50)}ms ➜ ${formatInt(1)}ms`,
-    effect: 1
+    description: () => `Base Replicanti interval limit ${formatInt(50)}ms ➜ ${formatInt((devVars.eternity.masteredTimeStudies ? 0.01 : 1))}ms`,
+    effect: () => devVars.eternity.masteredTimeStudies ? 0.01 : 1
   },
   {
     id: 31,
     cost: 3,
     requirement: [21],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
-    description: () => `Powers up multipliers that are based on your Infinities (Bonuses${formatPow(4)})`,
-    effect: 4
+    description: () => `Powers up multipliers that are based on your Infinities (Bonuses${formatPow((devVars.eternity.masteredTimeStudies ? 36 : 4))})`,
+    effect: () => devVars.eternity.masteredTimeStudies ? 36 : 4
   },
   {
     id: 32,
     cost: 2,
     requirement: [22],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
-    description: `You gain more Infinities based on Dimension Boosts`,
+    description: `You gain more Infinities equal to Dimension Boosts amount`,
     effect: () => Math.max(DimBoost.totalBoosts, 1),
     formatEffect: value => formatX(value, 2)
   },
@@ -111,25 +113,25 @@ export const normalTimeStudies = [
     cost: 6,
     requirement: [32],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
-    description: () => `Antimatter Galaxy requirement increases by ${formatInt(52)}
+    description: () => `Antimatter Galaxy requirement increases by ${formatInt((devVars.eternity.masteredTimeStudies ? 48 : 52))}
       8th Dimensions instead of ${formatInt(60)}`,
-    effect: 52
+    effect: () => devVars.eternity.masteredTimeStudies ? 48 : 52
   },
   {
     id: 51,
     cost: 3,
     requirement: [41, 42],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
-    description: () => `You gain ${formatX(1e15)} more Infinity Points`,
-    effect: 1e15
+    description: () => `You gain ${formatX((devVars.eternity.masteredTimeStudies ? 1e200 : 1e15))} more Infinity Points`,
+    effect: () => devVars.eternity.masteredTimeStudies ? 1e200 : 1e15
   },
   {
     id: 61,
     cost: 3,
     requirement: [51],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
-    description: () => `You gain ${formatX(15)} more Eternity Points`,
-    effect: 15
+    description: () => `You gain ${formatX((devVars.eternity.masteredTimeStudies ? 5e15 : 15))} more Eternity Points`,
+    effect: () => devVars.eternity.masteredTimeStudies ? 5e15 : 15
   },
   {
     id: 62,
@@ -146,7 +148,7 @@ export const normalTimeStudies = [
     reqType: TS_REQUIREMENT_TYPE.DIMENSION_PATH,
     description: "Dimensional Sacrifice affects all other Antimatter Dimensions with reduced effect",
     effect: () => Sacrifice.totalBoost.pow(0.25).clampMin(1),
-    cap: DC.E210000,
+    cap: () => devVars.eternity.masteredTimeStudies ? DC.E1E9 : DC.E210000,
     formatEffect: value => formatX(value, 2, 1)
   },
   {
@@ -158,7 +160,7 @@ export const normalTimeStudies = [
     reqType: TS_REQUIREMENT_TYPE.DIMENSION_PATH,
     description: "Dimensional Sacrifice affects 4th Infinity Dimension with greatly reduced effect",
     effect: () => Sacrifice.totalBoost.pow(0.04).clampMin(1),
-    cap: DC.E30000,
+    cap: () => devVars.eternity.masteredTimeStudies ? DC.E2_5E7: DC.E30000,
     formatEffect: value => formatX(value, 2, 1)
   },
   {
@@ -168,7 +170,7 @@ export const normalTimeStudies = [
     reqType: TS_REQUIREMENT_TYPE.DIMENSION_PATH,
     description: "Dimensional Sacrifice affects 3rd Time Dimension with greatly reduced effect",
     effect: () => Sacrifice.totalBoost.pow(0.005).clampMin(1),
-    cap: DC.E1300,
+    cap: () => devVars.eternity.masteredTimeStudies ? DC.E500000 : DC.E1300,
     formatEffect: value => formatX(value, 2, 1)
   },
   {
@@ -176,8 +178,8 @@ export const normalTimeStudies = [
     cost: 4,
     requirement: [71],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
-    description: () => `Base Dimension Boost power becomes ${formatX(10)}`,
-    effect: 10
+    description: () => `Base Dimension Boost power becomes ${formatX((devVars.eternity.masteredTimeStudies ? 1e6 : 10))}`,
+    effect: () => devVars.eternity.masteredTimeStudies ? 1e6 : 10
   },
   {
     id: 82,
@@ -196,7 +198,7 @@ export const normalTimeStudies = [
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     description: "Dimension Boost multiplier based on tick upgrades gained from TDs",
     effect: () => DC.D1_0004.pow(player.totalTickGained),
-    cap: DC.E30,
+    cap: () => devVars.eternity.masteredTimeStudies ? DC.MAX : DC.E30,
     formatEffect: value => formatX(value, 2, 1)
   },
   {
@@ -224,8 +226,10 @@ export const normalTimeStudies = [
     cost: 7,
     requirement: [83],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
-    description: "Time Dimension multiplier based on tick upgrades gained",
-    effect: () => Decimal.pow(player.totalTickGained, 0.25).clampMin(1),
+    description: () => `Time Dimension multiplier ${devVars.eternity.masteredTimeStudies ? "equal to" : "based on"} tick upgrades gained`,
+    effect: () => devVars.eternity.masteredTimeStudies
+    ? Math.max(player.totalTickGained, 1)
+    : Decimal.pow(player.totalTickGained, 0.25).clampMin(1),
     formatEffect: value => formatX(value, 2, 1)
   },
   {
@@ -261,9 +265,15 @@ export const normalTimeStudies = [
     requirement: [101, 102, 103],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     description: () => (Achievement(103).canBeApplied
-      ? `Make the Infinity Point formula better log(x)/${formatFloat(307.8, 1)} ➜ log(x)/${formatInt(285)}`
-      : `Make the Infinity Point formula better log(x)/${formatInt(308)} ➜ log(x)/${formatInt(285)}`),
-    effect: 285
+      ? `Make the Infinity Point formula better log(x)/${formatFloat(307.8, 1)} ➜ log(x)/${formatInt(devVars.eternity.masteredTimeStudies
+        ? 250
+        : 285
+      )}`
+      : `Make the Infinity Point formula better log(x)/${formatInt(308)} ➜ log(x)/${formatInt(devVars.eternity.masteredTimeStudies
+        ? 250
+        : 285
+        )}`),
+    effect: () => devVars.eternity.masteredTimeStudies ? 250 : 285
   },
   {
     id: 121,
@@ -290,9 +300,9 @@ export const normalTimeStudies = [
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     requiresST: [121, 123],
     description: () => (Perk.studyPassive.isBought
-      ? `You gain ${formatX(50)} more Eternity Points`
+      ? `You gain ${formatX(500)} more Eternity Points`
       : `You gain ${formatX(35)} more Eternity Points`),
-    effect: () => (Perk.studyPassive.isBought ? 50 : 35)
+    effect: () => (Perk.studyPassive.isBought ? 500 : 35)
   },
   {
     id: 123,
@@ -317,9 +327,9 @@ export const normalTimeStudies = [
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     requiresST: [132, 133],
     description: () => (Achievement(138).isUnlocked
-      ? `You can get ${formatPercents(0.5)} more Replicanti Galaxies`
-      : `Automatic Replicanti Galaxies are disabled, but you can get ${formatPercents(0.5)} more`),
-    effect: () => Math.floor(player.replicanti.boughtGalaxyCap / 2)
+      ? `You can get ${formatPercents(devVars.eternity.masteredTimeStudies ? 2 / 3 : 0.5)} more Replicanti Galaxies`
+      : `Automatic Replicanti Galaxies are disabled, but you can get ${formatPercents(devVars.eternity.masteredTimeStudies ? 2 / 3 : 0.5)} more`),
+    effect: () => Math.floor(player.replicanti.boughtGalaxyCap / (devVars.eternity.masteredTimeStudies ? 1 + 2 / 3 : 2))
   },
   {
     id: 132,
@@ -341,10 +351,10 @@ export const normalTimeStudies = [
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     requiresST: [131, 132],
     description: () => (Achievement(138).isUnlocked
-      ? `Replicanti Galaxies are ${formatPercents(0.5)} stronger`
+      ? `Replicanti Galaxies are ${formatPercents(devVars.eternity.masteredTimeStudies ? 0.8 : 0.5)} stronger`
       : `Replicanti are ${formatX(10)} slower until ${format(Number.MAX_VALUE, 2)}` +
-    `, but Replicanti Galaxies are ${formatPercents(0.5)} stronger`),
-    effect: 0.5
+    `, but Replicanti Galaxies are ${formatPercents(devVars.eternity.masteredTimeStudies ? 0.8 : 0.5)} stronger`),
+    effect: () => devVars.eternity.masteredTimeStudies ? 0.8 : 0.5
   },
   {
     id: 141,
@@ -429,8 +439,8 @@ export const normalTimeStudies = [
       () => EternityChallenge(2).completions > 0 || Perk.bypassEC2Lock.isBought,
       () => EternityChallenge(3).completions > 0 || Perk.bypassEC3Lock.isBought],
     reqType: TS_REQUIREMENT_TYPE.ALL,
-    description: () => `You gain ${formatPercents(0.01)} of your Infinity Points gained on crunch each second`,
-    effect: () => gainedInfinityPoints().times(Time.deltaTime / 100)
+    description: () => `You gain ${formatPercents(1)} of your Infinity Points gained on crunch each second`,
+    effect: () => gainedInfinityPoints().times(Time.deltaTime)
       .timesEffectOf(Ra.unlocks.continuousTTBoost.effects.autoPrestige)
   },
   {
@@ -457,8 +467,8 @@ export const normalTimeStudies = [
     requirement: [181, () => EternityChallenge(10).completions > 0],
     reqType: TS_REQUIREMENT_TYPE.ALL,
     description: "Antimatter Dimension multiplier based on Eternities",
-    effect: () => (DC.E13000.pow(Currency.eternities.value.div(1e6).clampMax(1))),
-    cap: DC.E13000,
+    effect: () => ((devVars.eternity.masteredTimeStudies ? DC.E2500 : DC.E13000).pow(Currency.eternities.value.max(1))),
+    cap: () => devVars.eternity.masteredTimeStudies ? DC.E1E7 : DC.E13000,
     formatEffect: value => formatX(value, 2, 1)
   },
   {
@@ -483,7 +493,7 @@ export const normalTimeStudies = [
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     description: "All Galaxies are stronger based on your Time Shards",
     effect: () => Math.pow(Currency.timeShards.value.clampMin(2).log2(), 0.005),
-    cap: 1.1,
+    cap: () => devVars.eternity.masteredTimeStudies ? undefined : 1.1,
     formatEffect: value => `+${formatPercents(value - 1, 3)}`
   },
   {
@@ -491,8 +501,9 @@ export const normalTimeStudies = [
     cost: 200,
     requirement: [193],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
-    description: () => `You gain Replicanti ${formatInt(20)} times faster`,
-    effect: 20
+    description: () => `You gain Replicanti ${formatInt(devVars.eternity.masteredTimeStudies ? 500 : 20)} times faster
+    ${devVars.eternity.masteredTimeStudies ? " and you can go beyond 100% replicate chance" : ""}`,
+    effect: () => devVars.eternity.masteredTimeStudies ? 500 : 20
   },
   {
     id: 214,
@@ -506,7 +517,7 @@ export const normalTimeStudies = [
       const secondPart = totalBoost.pow(1.05).clampMaxExponent(120000);
       return firstPart.times(secondPart);
     },
-    cap: DC.E164000,
+    cap: () => devVars.eternity.masteredTimeStudies ? undefined : DC.E164000,
     formatEffect: value => formatX(value, 2, 1)
   },
   {
@@ -537,8 +548,8 @@ export const normalTimeStudies = [
     requirement: [212],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     requiresST: [224],
-    description: () => `Distant Galaxy cost scaling starts ${formatInt(7)} Galaxies later`,
-    effect: 7
+    description: () => `Distant Galaxy cost scaling starts ${formatInt(devVars.eternity.masteredTimeStudies ? 55 : 7)} Galaxies later`,
+    effect: () => devVars.eternity.masteredTimeStudies ? 55 : 7
   },
   {
     id: 224,
@@ -550,9 +561,9 @@ export const normalTimeStudies = [
     description() {
       const effect = TimeStudy(224).effectValue;
       return `Distant Galaxy cost scaling starts ${quantifyInt("Galaxy", effect)} later
-        (${formatInt(1)} per ${formatInt(2000)} Dim Boosts)`;
+        (${formatInt(1)} per ${formatInt(devVars.eternity.masteredTimeStudies ? 650 : 2000)} Dim Boosts)`;
     },
-    effect: () => Math.floor(DimBoost.totalBoosts / 2000)
+    effect: () => Math.floor(DimBoost.totalBoosts / (devVars.eternity.masteredTimeStudies ? 650 : 2000))
   },
   {
     id: 225,
@@ -562,7 +573,7 @@ export const normalTimeStudies = [
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     requiresST: [226],
     description: "You gain extra Replicanti Galaxies based on Replicanti amount",
-    effect: () => Math.floor(Replicanti.amount.exponent / 1000),
+    effect: () => Math.floor(Replicanti.amount.exponent / (devVars.eternity.masteredTimeStudies ? 811 : 1000)),
     formatEffect: value => `+${formatInt(value)} RG`
   },
   {
@@ -573,7 +584,7 @@ export const normalTimeStudies = [
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     requiresST: [225],
     description: "You gain extra Replicanti Galaxies based on their max",
-    effect: () => Math.floor(player.replicanti.boughtGalaxyCap / 15),
+    effect: () => Math.floor(player.replicanti.boughtGalaxyCap / (devVars.eternity.masteredTimeStudies ? 5.5 : 15)),
     formatEffect: value => `+${formatInt(value)} RG`
   },
   {
@@ -639,7 +650,7 @@ export const normalTimeStudies = [
     requirement: [227, 228],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     requiresST: [233],
-    description: "Dimensional Sacrifice applies to 1st Antimatter Dimension",
+    description: () => `Dimensional Sacrifice applies to 1st Antimatter${devVars.eternity.masteredTimeStudies ? ", 8th Infinity and Time" : ""} Dimension`,
     effect: () => Sacrifice.totalBoost,
   },
   // Note: These last 4 entries are the triad studies
